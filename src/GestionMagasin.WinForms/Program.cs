@@ -13,24 +13,19 @@ internal static class Program
         {
             var connectionFactory = new SqliteConnectionFactory();
             new DatabaseInitializer(connectionFactory).Initialize();
-            var adminService = new AdministrateurService(
-                new SqliteUtilisateurRepository(connectionFactory),
-                new PasswordHasher());
-
+            var adminService = new AdministrateurService(new SqliteUtilisateurRepository(connectionFactory), new PasswordHasher());
             if (!adminService.AdministrateurExiste())
             {
                 using var setup = new FirstAdminForm(adminService);
-                if (setup.ShowDialog() != DialogResult.OK)
-                    return; // Aucun accès à l'application tant que l'administrateur n'est pas créé.
+                if (setup.ShowDialog() != DialogResult.OK) return;
             }
-
-            Application.Run(new MainForm(connectionFactory.DatabasePath));
+            var catalogue = new CatalogueService(new SqliteCatalogueRepository(connectionFactory), new SqliteStockRepository(connectionFactory));
+            var stock = new StockService(new SqliteStockRepository(connectionFactory));
+            Application.Run(new MainForm(connectionFactory.DatabasePath, catalogue, stock));
         }
         catch (Exception exception)
         {
-            MessageBox.Show(
-                $"L'application n'a pas pu démarrer.\n\n{exception.Message}",
-                "Erreur de démarrage", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"L'application n'a pas pu démarrer.\n\n{exception.Message}", "Erreur de démarrage", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

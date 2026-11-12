@@ -1,22 +1,24 @@
-# Gestion Magasin — Cosmétiques
+# Gestion Magasin — Catalogue et stocks
 
-Squelette initial d'une application Windows Forms en C# avec une architecture en couches et une base SQLite locale.
+Application WinForms en couches (.NET 10 LTS): modèles, services métier, accès SQLite et interface. Le fichier SQLite est stocké sous `%LOCALAPPDATA%/GestionMagasin/gestion-magasin.db`.
 
-## Prérequis et lancement
+## Catalogue
 
-- .NET 10 SDK (Windows Desktop Runtime pour exécuter l'application)
-- Depuis Windows : `dotnet build Gestion_Magasin.sln`
-- Lancer `src/GestionMagasin.WinForms` avec `dotnet run --project src/GestionMagasin.WinForms`
+- Recherche par référence ou nom, filtre catégorie et statut actif/archivé, colonnes triables.
+- Création/modification de produits et catégories. L'archivage désactive la vente sans supprimer le produit ni ses mouvements.
+- Le stock affiché est une somme dynamique des quantités signées de `MouvementStock`; aucun champ de quantité n'est modifiable directement.
 
-La première ouverture applique les migrations et impose la création d'un administrateur. Aucun identifiant ni mot de passe par défaut n'est créé. La fenêtre principale constitue le point de départ pour les écrans métier à venir.
+## Mouvements et règles de stock
 
-## Architecture
+- Stock initial et réapprovisionnement : mouvements positifs.
+- Vente validée : mouvement négatif; refusée si produit archivé ou stock insuffisant.
+- Annulation de vente : mouvement positif lié à la vente originale, au plus une fois.
+- Correction : mouvement égal à l'écart exact entre stock compté et stock théorique.
+- Les écritures sont transactionnelles et sérialisées. Toute sortie est contrôlée contre le stock disponible.
+- Seuil : 0 = rouge « En rupture »; 0 < stock <= seuil = orange « Stock faible »; au-dessus = vert « Disponible ».
 
-- `GestionMagasin.Models` : modèles métier partagés.
-- `GestionMagasin.Data` : fabrique de connexions, migrations versionnées et dépôt SQLite.
-- `GestionMagasin.Services` : règles métier et hachage sécurisé des mots de passe.
-- `GestionMagasin.WinForms` : composition de l'application et interface utilisateur.
+L'initialisation applique automatiquement la migration version 2 sans effacer les données existantes. La validation d'une vente et son annulation sont exposées par les services pour être appelées par le futur module de caisse.
 
-La base est créée dans `%LOCALAPPDATA%/GestionMagasin/gestion-magasin.db`, hors du répertoire d'installation. Les migrations sont suivies dans `VersionSchema` et par `PRAGMA user_version`. Les clés étrangères sont activées sur chaque connexion.
+## Build
 
-Les mots de passe sont dérivés avec PBKDF2-HMAC-SHA256 (600 000 itérations), sel aléatoire unique de 16 octets et empreinte de 32 octets. Les paramètres sont enregistrés pour permettre une évolution ultérieure. Les requêtes SQL utilisent des paramètres.
+Sur Windows avec le SDK .NET 10 : `dotnet build Gestion_Magasin.sln`; puis `dotnet run --project src/GestionMagasin.WinForms`.
