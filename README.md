@@ -1,10 +1,17 @@
-# Tableau de bord, historique et rapports
+# Livraison x64 et sauvegardes
 
-- Tableau de bord et rapport produit journalier utilisent une journée métier locale [00:00, lendemain 00:00), et excluent les ventes annulées.
-- Les requêtes d'historique, détail, rapports et export appliquent les droits vendeur (ses ventes) / administrateur (toutes les ventes). L'annulation revalide le rôle administrateur actif en base, avec motif obligatoire.
-- L'annulation complète, les mouvements inverses et le statut sont enregistrés dans une transaction SQLite; une vente déjà annulée ne peut pas l'être une seconde fois. L'historique reste intact, les totaux sont recalculés depuis les ventes validées.
-- L'aperçu et l'impression utilisent `PrintDocument`; une erreur d'impression ne modifie jamais la vente.
-- L'export CSV utilise UTF-8 BOM, échappement CSV et apostrophe préventive des cellules pouvant être interprétées comme formules.
-- Migration de schéma version 4 ajoute vendeur, statut et informations d'annulation sans supprimer les ventes historiques.
+## Publication autonome Windows x64
 
-**Intégration requise :** `SessionUtilisateur` doit être créée uniquement après une authentification réelle et transmise aux écrans et services. Ne construisez pas cette session à partir d'un choix libre de rôle côté interface. Le dépôt de départ ne contenait pas de flux de connexion, ni de création de comptes vendeurs; l'application doit brancher son authentification avant d'exposer ces écrans afin que les restrictions soient effectives.
+1. Installer le SDK .NET 10 sur la machine de build et Inno Setup 6.
+2. Exécuter `installer/publish-win-x64.cmd`.
+3. Ouvrir `installer/GestionMagasin.iss` dans Inno Setup puis compiler. L'installeur est généré dans `artifacts/installer`.
+
+La publication `win-x64 --self-contained` embarque le runtime .NET : Visual Studio et le runtime .NET ne sont pas requis sur le poste client. Le fichier SQLite reste dans `%LOCALAPPDATA%` et n'est pas installé sous Program Files.
+
+## Backups
+
+`SqliteBackupService` utilise `SqliteConnection.BackupDatabase`, vérifie `integrity_check`, la version du schéma et les clés étrangères. Les restaurations passent par une copie temporaire validée et un backup pré-restauration. Les backups automatiques démarrent au lancement et s'effectuent une fois par jour tant que l'application reste ouverte; seuls les sept derniers automatiques sont gardés. Un backup manuel/restauration doit être exposé dans une interface d'administration authentifiée avant livraison.
+
+## Limites de recette à traiter
+
+La liste des cas est dans `docs/UAT.md`. Les statuts sont « À tester »: aucune exécution/build Windows n'a été effectuée dans cette modification. Les contraintes <2 s et les 18 cas doivent être mesurés sur une machine cible et une base représentative. Le dépôt doit aussi brancher la session authentifiée au service de vente pour attribuer `VendeurId`; les anciens enregistrements restent NULL jusqu'à une attribution explicite.
