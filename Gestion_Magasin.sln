@@ -1,0 +1,28 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionMagasin.Models", "src\GestionMagasin.Models\GestionMagasin.Models.csproj", "{0A6BF1DB-7A15-484D-8B68-65AFA516B142}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionMagasin.Data", "src\GestionMagasin.Data\GestionMagasin.Data.csproj", "{5DF4D9A5-80F0-4FD4-A88C-CE4589C3BCF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionMagasin.Services", "src\GestionMagasin.Services\GestionMagasin.Services.csproj", "{C26E1DDC-1C4E-45BA-9AD1-CB63E41C4A18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionMagasin.WinForms", "src\GestionMagasin.WinForms\GestionMagasin.WinForms.csproj", "{F15769F0-428C-46C9-9A08-AF73B45B4BB8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0A6BF1DB-7A15-484D-8B68-65AFA516B142}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A6BF1DB-7A15-484D-8B68-65AFA516B142}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A6BF1DB-7A15-484D-8B68-65AFA516B142}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A6BF1DB-7A15-484D-8B68-65AFA516B142}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DF4D9A5-80F0-4FD4-A88C-CE4589C3BCF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DF4D9A5-80F0-4FD4-A88C-CE4589C3BCF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DF4D9A5-80F0-4FD4-A88C-CE4589C3BCF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DF4D9A5-80F0-4FD4-A88C-CE4589C3BCF7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
