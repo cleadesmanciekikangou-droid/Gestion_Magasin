@@ -1,11 +1,10 @@
-# Gestion Magasin — Ventes
+# Tableau de bord, historique et rapports
 
-Le module « Nouvelle vente » permet de rechercher des produits actifs, de constituer un panier (les ajouts d'un même produit sont fusionnés), de modifier ou retirer une ligne et de choisir le paiement en espèces, Mobile Money ou carte.
+- Tableau de bord et rapport produit journalier utilisent une journée métier locale [00:00, lendemain 00:00), et excluent les ventes annulées.
+- Les requêtes d'historique, détail, rapports et export appliquent les droits vendeur (ses ventes) / administrateur (toutes les ventes). L'annulation revalide le rôle administrateur actif en base, avec motif obligatoire.
+- L'annulation complète, les mouvements inverses et le statut sont enregistrés dans une transaction SQLite; une vente déjà annulée ne peut pas l'être une seconde fois. L'historique reste intact, les totaux sont recalculés depuis les ventes validées.
+- L'aperçu et l'impression utilisent `PrintDocument`; une erreur d'impression ne modifie jamais la vente.
+- L'export CSV utilise UTF-8 BOM, échappement CSV et apostrophe préventive des cellules pouvant être interprétées comme formules.
+- Migration de schéma version 4 ajoute vendeur, statut et informations d'annulation sans supprimer les ventes historiques.
 
-La validation est effectuée dans une transaction SQLite immédiate : les produits, leur état actif, leur prix et leur stock sont relus avant toute écriture. Si un prix a changé ou si le stock est insuffisant, la transaction est annulée. Les lignes enregistrent les snapshots référence/nom/prix; les mouvements de sortie sont créés dans la même transaction.
-
-Chaque tentative possède un `JetonValidation` GUID unique stocké avec contrainte UNIQUE. Une répétition avec le même jeton retourne la vente déjà créée au lieu de la dupliquer. Le bouton de validation est désactivé pendant l'opération. En espèces, le montant insuffisant est bloqué et la monnaie est calculée; pour les paiements électroniques, le montant est fixé au total.
-
-La migration de schéma version 3 crée `Vente` et `LigneVente` et relie les mouvements à la vente sans supprimer les données des versions précédentes.
-
-Lancer sous Windows avec .NET 10 : `dotnet build Gestion_Magasin.sln`, puis `dotnet run --project src/GestionMagasin.WinForms`.
+**Intégration requise :** `SessionUtilisateur` doit être créée uniquement après une authentification réelle et transmise aux écrans et services. Ne construisez pas cette session à partir d'un choix libre de rôle côté interface. Le dépôt de départ ne contenait pas de flux de connexion, ni de création de comptes vendeurs; l'application doit brancher son authentification avant d'exposer ces écrans afin que les restrictions soient effectives.
