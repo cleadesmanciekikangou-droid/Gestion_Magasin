@@ -1,24 +1,11 @@
-# Gestion Magasin — Catalogue et stocks
+# Gestion Magasin — Ventes
 
-Application WinForms en couches (.NET 10 LTS): modèles, services métier, accès SQLite et interface. Le fichier SQLite est stocké sous `%LOCALAPPDATA%/GestionMagasin/gestion-magasin.db`.
+Le module « Nouvelle vente » permet de rechercher des produits actifs, de constituer un panier (les ajouts d'un même produit sont fusionnés), de modifier ou retirer une ligne et de choisir le paiement en espèces, Mobile Money ou carte.
 
-## Catalogue
+La validation est effectuée dans une transaction SQLite immédiate : les produits, leur état actif, leur prix et leur stock sont relus avant toute écriture. Si un prix a changé ou si le stock est insuffisant, la transaction est annulée. Les lignes enregistrent les snapshots référence/nom/prix; les mouvements de sortie sont créés dans la même transaction.
 
-- Recherche par référence ou nom, filtre catégorie et statut actif/archivé, colonnes triables.
-- Création/modification de produits et catégories. L'archivage désactive la vente sans supprimer le produit ni ses mouvements.
-- Le stock affiché est une somme dynamique des quantités signées de `MouvementStock`; aucun champ de quantité n'est modifiable directement.
+Chaque tentative possède un `JetonValidation` GUID unique stocké avec contrainte UNIQUE. Une répétition avec le même jeton retourne la vente déjà créée au lieu de la dupliquer. Le bouton de validation est désactivé pendant l'opération. En espèces, le montant insuffisant est bloqué et la monnaie est calculée; pour les paiements électroniques, le montant est fixé au total.
 
-## Mouvements et règles de stock
+La migration de schéma version 3 crée `Vente` et `LigneVente` et relie les mouvements à la vente sans supprimer les données des versions précédentes.
 
-- Stock initial et réapprovisionnement : mouvements positifs.
-- Vente validée : mouvement négatif; refusée si produit archivé ou stock insuffisant.
-- Annulation de vente : mouvement positif lié à la vente originale, au plus une fois.
-- Correction : mouvement égal à l'écart exact entre stock compté et stock théorique.
-- Les écritures sont transactionnelles et sérialisées. Toute sortie est contrôlée contre le stock disponible.
-- Seuil : 0 = rouge « En rupture »; 0 < stock <= seuil = orange « Stock faible »; au-dessus = vert « Disponible ».
-
-L'initialisation applique automatiquement la migration version 2 sans effacer les données existantes. La validation d'une vente et son annulation sont exposées par les services pour être appelées par le futur module de caisse.
-
-## Build
-
-Sur Windows avec le SDK .NET 10 : `dotnet build Gestion_Magasin.sln`; puis `dotnet run --project src/GestionMagasin.WinForms`.
+Lancer sous Windows avec .NET 10 : `dotnet build Gestion_Magasin.sln`, puis `dotnet run --project src/GestionMagasin.WinForms`.

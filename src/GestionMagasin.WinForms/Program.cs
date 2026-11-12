@@ -21,7 +21,8 @@ internal static class Program
             }
             var catalogue = new CatalogueService(new SqliteCatalogueRepository(connectionFactory), new SqliteStockRepository(connectionFactory));
             var stock = new StockService(new SqliteStockRepository(connectionFactory));
-            Application.Run(new MainForm(connectionFactory.DatabasePath, catalogue, stock));
+            var sales = new VenteService(new SqliteVenteRepository(connectionFactory));
+            Application.Run(new MainForm(connectionFactory.DatabasePath, catalogue, stock, sales));
         }
         catch (Exception exception)
         {
